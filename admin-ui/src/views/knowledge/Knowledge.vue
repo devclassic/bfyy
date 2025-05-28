@@ -142,7 +142,7 @@
   const isroot = sessionStorage.getItem('user') === 'root'
 
   let api_base_url = import.meta.env.VITE_API_BASE_URL
-  if (api_base_url.includes('admin')) {
+  if (!api_base_url) {
     api_base_url = ''
   }
 
