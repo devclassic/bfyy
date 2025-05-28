@@ -13,5 +13,6 @@ dependencies = [
     "pandas>=2.2.3",
     "pyinstaller>=6.12.0",
     "requests>=2.32.3",
+    "setuptools<81",
     "tortoise-orm>=0.24.2",
 ]
