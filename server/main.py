@@ -68,6 +68,8 @@ for router in routers:
 add_pagination(app)
 
 if __name__ == "__main__":
+    import multiprocessing
     import uvicorn
 
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    multiprocessing.freeze_support()
+    uvicorn.run(app, host="0.0.0.0", port=8000, workers=4)

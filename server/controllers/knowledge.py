@@ -97,7 +97,6 @@ async def add_file_collection(request: Request):
             response = await client.post(
                 url, data=send_data, files=files, headers=headers
             )
-            os.remove(file)
     return {"success": True, "message": "添加成功"}
 
 
