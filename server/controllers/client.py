@@ -155,4 +155,4 @@ async def zk(request: Request):
         return {"success": False, "message": "上传文件失败"}
     result = await run_workflow(file_id, type, content, "zk")
 
-    return {"success": True, "message": "运行内涵质控成功", "data": result}
+    return {"success": True, "message": "运行内涵质控工作流成功", "data": result}
