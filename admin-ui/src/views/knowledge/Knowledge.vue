@@ -120,7 +120,9 @@
         <em>点击上传</em>
       </div>
       <template #tip>
-        <div class="el-upload__tip">请上传常见文档类型（txt, pdf, docx, md, txt, html, csv...等）小于10M</div>
+        <div class="el-upload__tip">
+          请上传常见文档类型（txt, pdf, docx, md, txt, html, csv...等）小于10M
+        </div>
       </template>
     </el-upload>
     <template #footer>
@@ -139,7 +141,11 @@
 
   const isroot = sessionStorage.getItem('user') === 'root'
 
-  const api_base_url = import.meta.env.VITE_API_BASE_URL
+  let api_base_url = import.meta.env.VITE_API_BASE_URL
+  if (api_base_url.includes('admin')) {
+    api_base_url = ''
+  }
+
   const token = sessionStorage.getItem('token')
 
   const data = reactive({
