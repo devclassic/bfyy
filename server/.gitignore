@@ -1,0 +1,9 @@
+.venv
+__pycache__
+uv.lock
+public
+main.spec
+dist
+build
+database
+uploads

@@ -1,0 +1,21 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #eeeeee;
+}
+
+.toolbar {
+  margin: 10px 0;
+  display: flex;
+  justify-content: right;
+}
+
+.pager {
+  margin-top: 10px;
+  display: flex;
+  justify-content: right;
+}
