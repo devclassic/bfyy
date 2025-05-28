@@ -5,6 +5,7 @@ from service.common import get_dict
 import requests
 from datetime import datetime
 from httpx import AsyncClient
+import os
 
 router = APIRouter(prefix="/client")
 
@@ -69,13 +70,89 @@ async def chat(request: Request):
     headers = {
         "Authorization": f"Bearer {token}",
     }
-    # res = requests.post(url, json=data, headers=headers).json()
-    res = None
     async with AsyncClient(timeout=None) as client:
         res = await client.post(url, json=data, headers=headers)
         res = res.json()
-    text = res["answer"]
+    text = res.get("answer", None)
+    if not text:
+        return {
+            "success": False,
+            "message": "聊天失败，未获取到回答",
+            "data": "服务器异常",
+        }
     history["answer"] = text
     history["answer_time"] = datetime.now()
     await History.create(**history)
     return {"success": True, "message": "聊天成功", "data": text}
+
+
+@router.post("/zk")
+async def zk(request: Request):
+    data = await request.json()
+
+    appid = data.get("appid", None)
+    if not appid:
+        return {"success": False, "message": "请提供appid"}
+    type = data.get("type", None)
+    if not type:
+        return {"success": False, "message": "请提供type"}
+    content = data.get("content", None)
+    if not content:
+        return {"success": False, "message": "请提供content"}
+
+    api_base = await get_dict("api_base")
+    if not api_base:
+        return {"success": False, "message": "请先在后台配置api地址"}
+
+    app = await App.get_or_none(id=appid)
+
+    if not app:
+        return {"success": False, "message": "应用不存在"}
+
+    token = app.token
+
+    async def upload_file(file_path, user):
+        upload_url = f"{api_base}/files/upload"
+        headers = {
+            "Authorization": f"Bearer {token}",
+        }
+
+        with open(file_path, "rb") as file:
+            files = {"file": (os.path.basename(file_path), file)}
+            data = {"user": user, "type": "XLSX"}
+            async with AsyncClient(timeout=None) as client:
+                res = await client.post(
+                    upload_url, headers=headers, files=files, data=data
+                )
+        return res.json().get("id")
+
+    async def run_workflow(file_id, type, content, user, response_mode="blocking"):
+        workflow_url = f"{api_base}/workflows/run"
+        headers = {
+            "Authorization": f"Bearer {token}",
+            "Content-Type": "application/json",
+        }
+
+        data = {
+            "inputs": {
+                "file": {
+                    "transfer_method": "local_file",
+                    "upload_file_id": file_id,
+                    "type": "document",
+                },
+                "type": type,
+                "content": content,
+            },
+            "response_mode": response_mode,
+            "user": user,
+        }
+        async with AsyncClient(timeout=None) as client:
+            res = await client.post(workflow_url, headers=headers, json=data)
+        return res.json()
+
+    file_id = await upload_file("assets/zkgz.xlsx", "zk")
+    if not file_id:
+        return {"success": False, "message": "上传文件失败"}
+    result = await run_workflow(file_id, type, content, "zk")
+
+    return {"success": True, "message": "运行内涵质控成功", "data": result}

@@ -21,6 +21,7 @@
 
   <el-table :data="data.list" ref="list" border stripe>
     <el-table-column type="selection" width="38" />
+    <el-table-column prop="id" label="ID" />
     <el-table-column prop="name" label="名称" />
     <el-table-column prop="token" label="Token" show-overflow-tooltip />
     <el-table-column label="操作">
